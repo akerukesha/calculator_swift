@@ -7,17 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F121BE871EEFFA92005A722C /* CalculatorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F121BE861EEFFA92005A722C /* CalculatorViewController.swift */; };
+		F121BE891EF0052A005A722C /* CalculatorBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F121BE881EF0052A005A722C /* CalculatorBrain.swift */; };
 		F131603C1EEFF31800C7EECF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F131603B1EEFF31800C7EECF /* AppDelegate.swift */; };
-		F131603E1EEFF31800C7EECF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F131603D1EEFF31800C7EECF /* ViewController.swift */; };
 		F13160411EEFF31800C7EECF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F131603F1EEFF31800C7EECF /* Main.storyboard */; };
 		F13160431EEFF31800C7EECF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F13160421EEFF31800C7EECF /* Assets.xcassets */; };
 		F13160461EEFF31800C7EECF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F13160441EEFF31800C7EECF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F121BE861EEFFA92005A722C /* CalculatorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculatorViewController.swift; sourceTree = "<group>"; };
+		F121BE881EF0052A005A722C /* CalculatorBrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculatorBrain.swift; sourceTree = "<group>"; };
 		F13160381EEFF31800C7EECF /* Calculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Calculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F131603B1EEFF31800C7EECF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F131603D1EEFF31800C7EECF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		F13160401EEFF31800C7EECF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F13160421EEFF31800C7EECF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F13160451EEFF31800C7EECF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -35,6 +37,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F121BE851EEFFA28005A722C /* SupportingFiles */ = {
+			isa = PBXGroup;
+			children = (
+				F13160421EEFF31800C7EECF /* Assets.xcassets */,
+				F13160441EEFF31800C7EECF /* LaunchScreen.storyboard */,
+				F13160471EEFF31800C7EECF /* Info.plist */,
+			);
+			name = SupportingFiles;
+			sourceTree = "<group>";
+		};
 		F131602F1EEFF31800C7EECF = {
 			isa = PBXGroup;
 			children = (
@@ -55,11 +67,10 @@
 			isa = PBXGroup;
 			children = (
 				F131603B1EEFF31800C7EECF /* AppDelegate.swift */,
-				F131603D1EEFF31800C7EECF /* ViewController.swift */,
+				F121BE881EF0052A005A722C /* CalculatorBrain.swift */,
+				F121BE861EEFFA92005A722C /* CalculatorViewController.swift */,
 				F131603F1EEFF31800C7EECF /* Main.storyboard */,
-				F13160421EEFF31800C7EECF /* Assets.xcassets */,
-				F13160441EEFF31800C7EECF /* LaunchScreen.storyboard */,
-				F13160471EEFF31800C7EECF /* Info.plist */,
+				F121BE851EEFFA28005A722C /* SupportingFiles */,
 			);
 			path = Calculator;
 			sourceTree = "<group>";
@@ -137,7 +148,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F131603E1EEFF31800C7EECF /* ViewController.swift in Sources */,
+				F121BE891EF0052A005A722C /* CalculatorBrain.swift in Sources */,
+				F121BE871EEFFA92005A722C /* CalculatorViewController.swift in Sources */,
 				F131603C1EEFF31800C7EECF /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
