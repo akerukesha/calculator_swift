@@ -48,4 +48,11 @@ class CalculatorViewController: UIViewController {
             }
         }
     }
+    @IBAction func makeDouble(_ sender: Any) {
+        // displayLabel!.text? или displayLabel!.text!  почему?
+        if displayLabel != nil, displayLabel!.text!.contains(".") == false {
+            let currentTextInDisplay = displayLabel.text!
+            displayLabel.text = currentTextInDisplay + "."
+        }
+    }
 }
