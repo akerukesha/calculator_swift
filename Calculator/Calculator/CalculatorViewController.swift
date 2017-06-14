@@ -12,6 +12,8 @@ class CalculatorViewController: UIViewController {
     
     @IBOutlet weak var displayLabel: UILabel!
     
+    @IBOutlet weak var descriptionLabel: UILabel!
+    
     var brain = CalculatorBrain()
     var userInTheMiddleOfTyping = false
     
@@ -21,12 +23,23 @@ class CalculatorViewController: UIViewController {
         
         if !userInTheMiddleOfTyping {
             displayLabel.text = digit
-            if digit != "0"{
-                userInTheMiddleOfTyping = true
-            }
+            
+            //9 + 3 = 12, 0 + 3 = 15 bug
+            userInTheMiddleOfTyping = true
         } else {
-            displayLabel.text = currentTextInDisplay + digit
+            
+            //нужно реализовать по-другому
+            if currentTextInDisplay == "0"{
+                displayLabel.text = digit
+            } else {
+                displayLabel.text = currentTextInDisplay + digit
+            }
         }
+    }
+    
+    var displayDescription: String {
+        get { return displayLabel.text! }
+        set { descriptionLabel.text = newValue }
     }
     
     var displayValue: Double {
@@ -46,8 +59,12 @@ class CalculatorViewController: UIViewController {
             if let result = brain.result {
                 displayValue = result
             }
+            if let description = brain.description {
+                displayDescription = description
+            }
         }
     }
+    
     @IBAction func makeDouble(_ sender: Any) {
         // displayLabel!.text? или displayLabel!.text!  почему?
         if displayLabel != nil, displayLabel!.text!.contains(".") == false {
