@@ -10,46 +10,44 @@ import Foundation
 struct CalculatorBrain {
     
     private var accumulator: Double? = 0
-    private var pbo: PendingBinaryOperation?
-    private var resultIsPending: Bool?
-    private var descriptionText: [String] = []
-    private var prevOperation: OperationDescription = .clear
+    private var resultIsPending: Bool = false
+    
+    private var currentResult: Double? = 0
+    private var resultText: String = ""
+    private var accumulatorText: String? = ""
+    
+    private var currentFunction: (Double, Double) -> Double = {$0 + $1}
+    private var currentSymbol: String = ""
+    
+    func format(number: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.maximumSignificantDigits = 6
+        return formatter.string(from: number as NSNumber)!
+    }
     
     // закачиваем операнд в модельку
     mutating func setOperand(_ operand: Double) {
-        if prevOperation == .unaryOperation || prevOperation == .constant || prevOperation == .number {
-            descriptionText = []
-        }
-        prevOperation = .number
         accumulator = operand
-        descriptionText.append(String(operand))
+        accumulatorText = format(number: operand)
     }
     
     private enum Operation {
         case constant(Double)
-        case unaryOperation((Double) -> Double)
+        case random(() -> Double)
+        case unaryOperation((Double, String) -> (Double, String))
         case binaryOperation((Double, Double) -> Double)
         case result
         case clear
     }
     
-    private enum OperationDescription {
-        case clear
-        case number
-        case constant
-        case unaryOperation
-        case binaryOperation
-        case result
-    }
-    
     private var operations: [String: Operation] = [
         "π": Operation.constant(Double.pi),
         "e": Operation.constant(M_E),
-        "rand": Operation.constant(Double(arc4random_uniform(1000) + 1000) / 10000),
-        "√": Operation.unaryOperation(sqrt),
-        "cos": Operation.unaryOperation(cos),
-        "sin": Operation.unaryOperation(sin),
-        "±": Operation.unaryOperation({ -$0 }),
+        "rand": Operation.random{ Double(arc4random()) / Double(UInt32.max) },
+        "√": Operation.unaryOperation{(sqrt($0), "√(" + $1 + ")")},
+        "cos": Operation.unaryOperation{(cos($0), "cos(" + $1 + ")")},
+        "sin": Operation.unaryOperation{(sin($0), "sin(" + $1 + ")")},
+        "±": Operation.unaryOperation{(-$0, "±(" + $1 + ")")},
         "+": Operation.binaryOperation(+),
         "-": Operation.binaryOperation(-),
         "×": Operation.binaryOperation(*),
@@ -58,121 +56,98 @@ struct CalculatorBrain {
         "AC": Operation.clear
     ]
     
-    private struct PendingBinaryOperation {
-        var firstOperand: Double
-        var function: (Double, Double) -> Double
-        
-        func perform(with secondOperand: Double) -> Double {
-            return function(firstOperand, secondOperand)
-        }
-    }
-    
     // выполняем операцию
     mutating func performOperation(_ symbol: String) {
         if let operation = operations[symbol] {
             switch operation {
             case .constant(let value):
-                if prevOperation != .binaryOperation, prevOperation != .clear {
-                    descriptionText = []
-                }
-                prevOperation = .constant
-                descriptionText.append(symbol)
+                accumulatorText = symbol
                 accumulator = value
+            case .random(let function):
+                accumulator = function()
+                accumulatorText = format(number: accumulator!)
             case .unaryOperation(let function):
-                //25 + √ √ = 27.23...
-//                if pbo != nil, accumulator == nil{
-//                    accumulator = pbo!.firstOperand
-//                }
+                if resultIsPending == true && accumulator == nil {
+                    accumulator = currentResult
+                    accumulatorText = resultText
+                }
                 if accumulator != nil {
-                    if descriptionText.count == 0 {
-                        descriptionText.append("0")
-                    }
-                    placeBrackets(symbol: symbol, currentOperation: OperationDescription.unaryOperation)
-                    prevOperation = .unaryOperation
-                    accumulator = function(accumulator!);
-
+                    let currentOperation = function(accumulator!, accumulatorText!)
+                    accumulator = currentOperation.0
+                    accumulatorText = currentOperation.1
+                } else {
+                    let currentOperation = function(accumulator!, resultText)
+                    currentResult = currentOperation.0
+                    resultText = currentOperation.1
                 }
             case .binaryOperation(let function):
-                //5 + 5 - 10 = -10 bug
-                
-                //почему так?
-                //pbo?.function = function
-                
-                if accumulator != nil {
-                    if prevOperation == .result {
-                        resultIsPending = true
+                if resultIsPending == true {
+                    if accumulator != nil {
+                        currentResult = currentFunction(currentResult!, accumulator!)
+                        resultText += currentSymbol + accumulatorText!
+                        resultText = "(" + resultText + ")"
                     }
-                    if prevOperation == .clear{
-                        descriptionText.append("0")
+                } else if resultText.isEmpty == false {
+                    resultText = "(" + resultText + ")"
+                } else if resultText.isEmpty {
+                    if accumulator == 0 {
+                        accumulatorText = "0"
                     }
-                    placeBrackets(symbol: symbol, currentOperation: OperationDescription.binaryOperation)
-                    prevOperation = .binaryOperation
-                    resultIsPending = true
-                    descriptionText.append(symbol)
-                    if pbo != nil {
-                        accumulator = pbo?.perform(with: accumulator!)
-                    }
-                    pbo = PendingBinaryOperation(firstOperand: accumulator!, function: function)
+                    currentResult = accumulator
+                    resultText = accumulatorText!
                 }
+                currentFunction = function
+                currentSymbol = symbol
+                resultIsPending = true
+                accumulator = nil
+                accumulatorText = nil
             case .result:
-                //2 + 3 + 4 + + + + + = 9
-                if accumulator != nil {
-                    prevOperation = .result
+                if resultIsPending == true {
+                    if accumulator != nil {
+                        currentResult = currentFunction(currentResult!, accumulator!)
+                        resultText += currentSymbol + accumulatorText!
+                        accumulator = nil
+                        accumulatorText = nil
+                    }
                     resultIsPending = false
-                    descriptionText.append(symbol)
-                    accumulator = pbo?.perform(with: accumulator!)
-                    pbo = nil
-                    //2 + 2 + 2 = = = = = = * 3 = 18
                 }
             case .clear:
-                prevOperation = .clear
                 accumulator = 0
-                pbo = nil
-                descriptionText = []
+                currentResult = nil
+                accumulatorText = ""
+                resultText = ""
+                
                 resultIsPending = false
-            }
-        }
-    }
-    
-    mutating private func placeBrackets(symbol: String, currentOperation: OperationDescription){
-        if prevOperation == .result || prevOperation == .binaryOperation {
-            descriptionText.remove(at: descriptionText.count - 1)
-        }
-        
-        if currentOperation == .binaryOperation, symbol == "×" || symbol == "÷" {
-            if resultIsPending == true {
-                descriptionText.insert(")", at: descriptionText.count)
-                descriptionText.insert("(", at: 0)
-            }
-        }else if currentOperation == .unaryOperation {
-//            print("unary")
-            if prevOperation == .result || prevOperation == .unaryOperation {
-                descriptionText.insert(symbol, at: 0)
-                descriptionText.insert("(", at: 1)
-                descriptionText.insert(")", at: descriptionText.count)
-            } else {
-                descriptionText.insert(symbol, at: descriptionText.count - 1)
-                descriptionText.insert("(", at: descriptionText.count - 1)
-                descriptionText.insert(")", at: descriptionText.count)
+                currentFunction = {$0 + $1}
+                currentSymbol = ""
             }
         }
     }
     
     var result: Double? {
-        return accumulator
+        if accumulator != nil{
+            return accumulator
+        }
+        return currentResult
     }
     
     var description: String? {
-        get {
-            if resultIsPending != nil, resultIsPending == true {
-                return descriptionText.joined(separator: " ") + " ..."
+        var currentText: [String] = []
+        
+        currentText.append(resultText)
+        if resultIsPending == true || resultText.isEmpty {
+            currentText.append(currentSymbol)
+            if accumulator != nil {
+                currentText.append(accumulatorText!)
             }
-            return descriptionText.joined(separator: " ")
+            currentText.append("...")
+        } else {
+            if accumulator != nil {
+                currentText.append(accumulatorText!)
+            }
+            currentText.append("=")
         }
+        return currentText.joined()
     }
     
 }
-
-//25 + √ = 30 description bug
-//25 = 6 = description bug
-//25 = + does not change to + logical bug
