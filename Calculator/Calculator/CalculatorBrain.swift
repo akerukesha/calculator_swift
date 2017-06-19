@@ -85,7 +85,10 @@ struct CalculatorBrain {
                     if accumulator != nil {
                         currentResult = currentFunction(currentResult!, accumulator!)
                         resultText += currentSymbol + accumulatorText!
-                        resultText = "(" + resultText + ")"
+                        print(symbol)
+                        if symbol == "×" || symbol == "÷" {
+                            resultText = "(" + resultText + ")"
+                        }
                     }
                 } else if resultText.isEmpty == false {
                     resultText = "(" + resultText + ")"
