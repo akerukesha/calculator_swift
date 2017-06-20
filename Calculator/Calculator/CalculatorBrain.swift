@@ -19,16 +19,10 @@ struct CalculatorBrain {
     private var currentFunction: (Double, Double) -> Double = {$0 + $1}
     private var currentSymbol: String = ""
     
-    func format(number: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.maximumSignificantDigits = 6
-        return formatter.string(from: number as NSNumber)!
-    }
-    
     // закачиваем операнд в модельку
     mutating func setOperand(_ operand: Double) {
         accumulator = operand
-        accumulatorText = format(number: operand)
+        accumulatorText = formatter.string(from: operand as NSNumber!)
     }
     
     private enum Operation {
@@ -65,7 +59,7 @@ struct CalculatorBrain {
                 accumulator = value
             case .random(let function):
                 accumulator = function()
-                accumulatorText = format(number: accumulator!)
+                accumulatorText = formatter.string(from: accumulator! as NSNumber!)
             case .unaryOperation(let function):
                 if resultIsPending == true && accumulator == nil {
                     accumulator = currentResult
@@ -76,7 +70,7 @@ struct CalculatorBrain {
                     accumulator = currentOperation.0
                     accumulatorText = currentOperation.1
                 } else {
-                    let currentOperation = function(accumulator!, resultText)
+                    let currentOperation = function(currentResult!, resultText)
                     currentResult = currentOperation.0
                     resultText = currentOperation.1
                 }

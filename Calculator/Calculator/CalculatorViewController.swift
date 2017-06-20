@@ -8,22 +8,22 @@
 
 import UIKit
 
+var formatter: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.maximumSignificantDigits = 6
+    return formatter
+}()
+
 class CalculatorViewController: UIViewController {
     
-    @IBOutlet weak var displayLabel: UILabel!
+    @IBOutlet weak private var displayLabel: UILabel!
     
-    @IBOutlet weak var descriptionLabel: UILabel!
+    @IBOutlet weak private var descriptionLabel: UILabel!
     
-    var brain = CalculatorBrain()
-    var userInTheMiddleOfTyping = false
+    private var brain = CalculatorBrain()
+    private var userInTheMiddleOfTyping = false
     
-    func format(number: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.maximumSignificantDigits = 6
-        return formatter.string(from: number as NSNumber)!
-    }
-    
-    @IBAction func touchDigit(_ sender: UIButton) {
+    @IBAction private func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         let currentTextInDisplay = displayLabel.text!
         
@@ -43,17 +43,17 @@ class CalculatorViewController: UIViewController {
         }
     }
     
-    var displayDescription: String {
+    private var displayDescription: String {
         get { return displayLabel.text! }
         set { descriptionLabel.text = newValue }
     }
     
-    var displayValue: Double {
+    private var displayValue: Double {
         get { return Double(displayLabel.text!)! }
-        set { displayLabel.text = format(number: newValue) }
+        set { displayLabel.text = formatter.string(from: newValue as NSNumber!) }
     }
 
-    @IBAction func performOperation(_ sender: UIButton) {
+    @IBAction private func performOperation(_ sender: UIButton) {
         if userInTheMiddleOfTyping {
             brain.setOperand(displayValue)
             userInTheMiddleOfTyping = false
@@ -72,8 +72,9 @@ class CalculatorViewController: UIViewController {
     }
     
     @IBAction func makeDouble(_ sender: Any) {
-
-        if displayLabel != nil, displayLabel!.text!.contains(".") == false {
+        //эквивалент
+        //guard displayLabel!.text?.characters.index(of: ".") == nil else {return}
+        if displayLabel!.text!.contains(".") == false {
             let currentTextInDisplay = displayLabel.text!
             displayLabel.text = currentTextInDisplay + "."
         }
